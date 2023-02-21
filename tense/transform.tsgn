@@ -1,0 +1,693 @@
+% % Tsugeson script for Japanese Tense Expressions
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〇〇に(〇〇出現、〇〇も〇〇となった。)
+% to: (〇〇に〇〇出現、)〇〇も〇〇となった。
+
+/^S\[[a-z,=]*\]$/=all <1 (/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/=x_ni <1 (/^NP\[[a-z,=]*\]$/) <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/ <: に)) <2 (/^S\[[a-z,=]*\]$/=ato <1 (/^NP\[[a-z,=]*\]$/=x_to <1 (/^NP\[case=nc,mod=nm,fin=f\]$/=z <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=x_mo <1 (/^NP\[case=nc,mod=nm,fin=f\]$/=x <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=ev_ten <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=ev) <2 (/^<NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]>\\<NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]>$/=ten <: 、))) <2 (/^<NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/=mo <: も)) <2 (/^NP\[case=nc,mod=nm,fin=f\]$/=ev_keiko)) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=to <: と)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=natta <1 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=naru)))
+
+adjoinF (S=x_ni2 @) x_ni
+adjoinF (S/S=x_ni3 @) x_ni2
+move ev >2 x_ni2
+move ev_ten >2 x_ni3
+adjoinF (<S/S>\\S=ten2 @) ten
+excise ev ev
+excise ev_ten ev_ten
+excise ten ten
+excise x x
+adjoinF (NP[case=to,mod=nm,fin=f]=ev_keiko2 @) ev_keiko
+move to >2 ev_keiko2
+adjoinF (S\\NP[case=ga,mod=nm,fin=f]=ev_keiko3 @) ev_keiko2
+adjoinF (<S\\NP[case=ga,mod=nm,fin=f]>\\NP[case=to,mod=nm,fin=f]=naru2 @) naru
+excise naru naru
+move natta >2 ev_keiko3
+adjoinF (<S\\NP[case=ga,mod=nm,fin=f]>\\NP[case=to,mod=nm,fin=f]=natta2 @) natta
+excise natta natta
+adjoinF (NP\\NP[case=nc,mod=nm,fin=f]=mo2 @) mo
+excise mo mo
+adjoinF (NP[case=ga,mod=nm,fin=f]=x_mo2 @) x_mo
+excise x_mo x_mo
+excise x_to x_to
+excise z z
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: ((((〜と)(インスリン感受性))の)(改善作用))
+% to: ((〜と)(((インスリン感受性)の)(改善作用)))
+
+/^NP\[[a-z,=]*\]$/=s <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=npno <1 (/^NP\[[a-z,=]*\]$/=s1 <2 (/^NP\[[a-z,=]*\]$/=kanju <: (/^NP\[[a-z,=X12]*\]$/=kanju2 <: インスリン感受性))) <2 (/^\<NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]\>\\NP\[[a-z,=]*\]$/=no)) <2 (/^NP\[[a-z,=]*\]$/=en)
+
+adjoinF (NP[case=nc,mod=nm,fin=f]/NP[case=X1,mod=X2,fin=en]=x @) no
+move kanju >1 x
+move x >1 en
+relabel no /<NP\/NP>\\NP/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〜及び〜すること
+% to: 及びを(NP/NP)\NP にして、〜することもいい感じに
+
+/^NP\[[a-z,=]*\]$/=all <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np < (/^S\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=x_oyobi <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=x1 < (/^S\[[a-z,=X12]*\]$/)) <2 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=oyobi <: /及び|および/)) <2 (/^NP\[[a-z,=]*\]$/=en)) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/ <: を)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/))) <2 (/^NP\[[a-z,=X12]*\]$/=koto <: こと)
+
+adjoinF (NP[case=nc,mod=nm,fin=f]=x1_2 @) x1
+excise x1 x1
+adjoinF (<NP/NP>\\NP=oyobi2 @) oyobi
+excise oyobi oyobi
+relabel koto /NP\\S[koto\]/
+excise np np
+adjoinF (NP[case=nc,mod=nm,fin=f]=all2 @) all
+move x_oyobi >1 all2
+excise en en
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: ((((〜と)インスリン感受性)を)(改善する))作用
+% to: 〜と(((インスリン感受性を)改善する)作用)
+
+/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=all <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/=s <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=s2 <: (/^S\[[a-z,=]*\]$/=s3 <1 (/^NP\[[a-z,=]*\]$/=swo <1 (/^NP\[[a-z,=]*\]$/=snp <2 (/^NP\[[a-z,=]*\]$/=kanju <: (/^NP\[[a-z,=X12]*\]$/=kanju2 <: インスリン感受性))) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=wo <: を)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=kaizen))) <2 (/^NP\[[a-z,=]*\]$/=sayo <: 作用)))<2 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=awase <: 併せ持つ)
+
+adjoinF (NP[case=o,mod=nm,fin=f]=x @) wo
+move kanju >1 x
+adjoinF (S=y @) kaizen
+move x >1 y
+adjoinF (NP=z @) sayo
+move y >1 z
+excise s2 snp
+adjoinF (NP/NP[e_en\] @) y
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: (((((〜して、)(改善する))傾向)に)なった。)
+% to: (〜して、(((改善する傾向)に)なった)。)
+
+/^S\[[a-z,=]*\]$/=niaru<1(/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/=z<1(/^NP\[[a-z,=]*\]$/=x<1(/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=y<:(/^S\[[a-z,=]*\]$/=y2<2(/^S\[[a-z,=]*\]$/=ev<1(/^S\[[a-z,=]*\]$/=ev1)<2(/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/=ev2<:する))))<2(/^NP\[[a-z,=]*\]$/=t_en<:傾向))<2(/^\<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]\>\\NP\[[a-z,=]*\]$/=ni<:に))<2(/^S\[[a-z,=]*\]$/=aru)
+
+adjoinF (S=x_1 @) aru
+move ni >1 x_1
+adjoinF (S/S=y_1 @) ni
+move t_en >1 y_1
+adjoinF (NP=z_1 @) t_en
+move ev >1 z_1
+excise z y2
+adjoinF (NP/NP=ev_1 @) ev
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: (((〜より、(血糖が改善する))効果)が)見られた。
+% to: 〜より、(((血糖が改善する)効果)が見られた)。
+
+/^S\[[a-z,=]*\]$/=s <1 (/^NP\[[a-z,=]*\]$/=en_ga <1 (/^NP\[[a-z,=]*\]$/=en <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=x <: (/^S\[[a-z,=]*\]$/=y <2 (/^S\[[a-z,=]*\]$/=ev))) <2 (/^NP\[[a-z,=]*\]$/=e_en <: 効果)) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=ga <: が)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=mirareta)
+
+adjoinF (S=x_1 @) mirareta
+adjoinF (NP=een_1 @) e_en
+move ev >1 een_1
+adjoinF (NP=ga_1 @) ga
+move een_1 >1 ga_1
+move ga_1 >1 x_1
+adjoinF (NP/NP[e_en\] @) ev
+excise en_ga y
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〜と((((同等の血液)が)(降下する))作用)があることが〜
+% to: 〜と同等の(((血液が)(降下する))作用)があることが〜
+
+/^NP\[[a-z,=]*\]$/=s <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=x1 <: (/^S\[[a-z,=]*\]$/=x2 <1 (/^NP\[[a-z,=]*\]$/=sga <1 (/^NP\[[a-z,=]*\]$/=x <2 (/^NP\[[a-z,=]*\]$/=en < 2 (/^NP\[[a-z,=]*\]$/=en2))) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=ga)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=koukasuru))) <2 (/^NP\[[a-z,=]*\]$/=e_en <: 作用)
+
+adjoinF (NP=enga @) en2
+move ga >2 enga
+adjoinF (S=nom @) enga
+move koukasuru >2 nom
+adjoinF (NP/NP[e_en\]=nom2 @) nom
+adjoinF (NP=een @) nom2
+move e_en >2 een
+excise x1 x
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: （〜に対する〜を〜する）作用
+% to: 〜に対する（〜を〜する作用）
+
+/^NP\[[a-z,=]*\]$/=all <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=x_suru < (/^S\[[a-z,=X12]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/=en <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=mae < (/^S\[[a-z,=]*\]$/)))) <2 (/^S\[[a-z,=X12]*\]\\NP\[[a-z,=]*\]$/))) <2 (/^NP\[[a-z,=]*\]$/=sayo <: 作用)
+
+adjoinF (NP[case=nc,mod=nm,fin=f]=sayo2 @) sayo
+move mae >1 all
+move x_suru >1 sayo2
+excise en en
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〜を使用する量　
+% to: から Nom　を消去
+
+/^NP\[[a-z,=]*\]$/=en <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=ev <1 (/^S\[[a-z,=X12]*\]\\NP\[[a-z,=]*\]$/=q_en <1 (/^NP\[case=o,mod=nm,fin=f\]$/) <2 (/^\<S\[[a-z,=X12]*\]\\NP\[[a-z,=]*\]\>\\NP\[case=o,mod=nm,fin=f\]$/=shiyosuru <1 (/^\<S\[[a-z,=X12]*\]\\NP\[[a-z,=]*\]\>\\NP\[case=o,mod=nm,fin=f\]$/=shiyo)) ))<2 (/^NP\[[a-z,=]*\]$/=qen<: /量|頻度/)
+
+relabel shiyo /S\\NP[case=o,mod=nm\]/
+relabel shiyosuru /S\\NP[case=o,mod=nm\]/
+relabel q_en S
+relabel ev /NP\/NP[q_en\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: (徐々に解熱する)傾向
+% to: 徐々に(解熱する傾向)
+
+/^S\[[a-z,=]*\]$/=x2 <1 (/^NP\[[a-z,=]*\]$/=x1 <1 (/^NP\[[a-z,=]*\]$/=en <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=s <: (/^S\[[a-z,=]*\]$/=s2 <2 (/^S\[[a-z,=]*\]$/=ev))) <2 (/^NP\[[a-z,=]*\]$/=keiko <: 傾向)) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=to))<2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=naru)
+
+adjoinF (S=x @) naru
+adjoinF (NP=y @) to
+adjoinF (NP=z @) keiko
+adjoinF (NP/NP[t_en]=a @) ev
+move a >1 z
+move z >1 y
+move y >1 x
+excise x1 s2
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 「〜する」量の統語範疇が「傾向系」と同じになる
+% to: 「〜する」の統語範疇を「量系」にする
+
+/^NP\[[a-z,=]*\]$/=en <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=ev)<2 (/^NP\[[a-z,=]*\]$/=qen<: /時間|量|期間|頻度/)
+
+relabel ev /NP\/NP[q_en\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 「〜する」作用　の統語範疇が「傾向系」と同じになる
+% to: 「〜する」の統語範疇を「作用系」にする
+
+/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/ = ev < (/^S\[[a-z,=]*\]$/)) <2 (/^NP\[[a-z,=]*\]/ = e_en <: /作用|効果/)
+
+relabel ev /NP\/NP[e_en\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 「〜する」量の統語範疇が「傾向系」と同じになる
+% to: 「〜する」の統語範疇を「量系」にする
+
+/^NP\[[a-z,=]*\]$/=en <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=ev)<2 (/^NP\[[a-z,=]*\]$/=qen<: /時間|量|期間|頻度/)
+
+relabel ev /NP\/NP[q_en\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 脳梗塞、左房内血栓の統語範疇
+% to: 脳梗塞と左房内血栓 のようにする
+
+/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=npnp < (/^NP\[[a-z,=X12]*\]$/=nokosoku <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/ <: 脳))) <2 (/^\<NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]\>\\\<NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]\>$/=ten <: 、)) <2 (/^NP\[[a-z,=]*\]$/ < /^NP\[[a-z,=X12]*\]$/)
+
+excise npnp npnp
+adjoinF (<NP[case=X1,mod=X2,fin=f]/NP[case=X1,mod=X2,fin=f]>\\NP[case=X1,mod=X2,fin=en]=x @) ten
+excise ten ten
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 「基本動作練習、歩行練習」の統語範疇
+% to: 「基本動作練習と歩行練習」 のようにする
+
+/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=npnp < (/^S\[[a-z,=X12]*\]$/=mae <1 (/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/) <2 (/^S\[[a-z,=X12]*\]$/ <: 練習))) <2 (/^\<NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]\>\\\<NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]\>$/=ten <: 、)) <2 (/^NP\[[a-z,=]*\]$/ < (/^S\[[a-z,=X12]*\]$/ <2 (/^S\[[a-z,=X12]*\]$/ <: 練習)))
+
+adjoinF (NP[case=X1,mod=X2,fin=en]=npnp2 @) npnp
+excise npnp npnp
+adjoinF (<NP[case=X1,mod=X2,fin=f]/NP[case=X1,mod=X2,fin=f]>\\NP[case=X1,mod=X2,fin=en]=ten2 @) ten
+excise ten ten
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: WF投与を開始する
+% to: WO EV S_EVの意味表示に揃える
+
+%/^S\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/=wftoyo <1 (/^S\[[a-z,=X2]*\]$/)) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=wo <: を)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/ <1 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/ <1 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=kaishi <: 開始) <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/=suru < し)))
+
+%adjoinF (S[mod=nm,form=cont,fin=f]\\S[mod=nm,form=stem,fin=s_ev]=x @) suru
+%adjoinF (S[mod=nm,form=stem,fin=s_ev]\\NP[case=o,mod=nm,fin=f]=y @) kaishi
+%adjoinF (NP[case=nc,mod=nm,fin=s_ev]=z @) wftoyo
+%adjoinF (NP[case=o,mod=nm,fin=f]\\NP[case=nc,mod=nm,fin=s_ev]=a @) wo
+%excise kaishi kaishi
+%excise suru suru
+%excise wftoyo wftoyo
+%excise wo wo
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 血栓を予防することを目的
+% to: WO EVを目的
+
+%/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np < (/^S\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <: 血栓) <2 (/^NP\[[a-z,=X12]*\]\\NP\[[a-z,=X12]*\]$/ <: /を|が/)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/ <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/ <: する)))) <2 (/^NP\[[a-z,=]*\]$/=koto <: こと)) <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/ <: を)
+
+%excise np np
+%relabel koto /NP\\S[koto\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〜(を|が)〜すること（を｜に）〜
+% to: (WO|NI) EVを〜
+
+/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np < (/^S\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/) <2 (/^NP\[[a-z,=X12]*\]\\NP\[[a-z,=X12]*\]$/ <: /を|が/)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/ <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/ <: する)))) <2 (/^NP\[[a-z,=]*\]$/=koto <: こと)) <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/ <: /を|に/)
+
+excise np np
+relabel koto /NP\\S[koto\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〜を〜（した｜する）こと(が|を）〜
+% to: WO EV が〜
+
+/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np <1 (/^S\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <2 (/^NP\[[a-z,=X12]*\]\\NP\[[a-z,=X12]*\]$/ <: /を|が/)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/ <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/ <: /た|する/)))) <2 (/^NP\[[a-z,=]*\]$/=koto <: こと)
+
+excise np np
+relabel koto /NP\\S[koto\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: (WO EV | EV) すること〜
+% to: WO EV 〜
+
+/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np <1 (/^S\[[a-z,=]*\]$/ <1 (/^S\[[a-z,=X12]*\]$/) <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/ <: /た|する/))) <2 (/^NP\[[a-z,=]*\]$/=koto <: こと)
+
+excise np np
+relabel koto /NP\\S[koto\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〜を〜することにより
+% to: WO EV により
+
+/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/=all < 1 (/^NP\[[a-z,=]*\]$/=ev_koto <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np <1 (/^S\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <2 (/^NP\[[a-z,=X12]*\]\\NP\[[a-z,=X12]*\]$/ <: を)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/ <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/ <: する)))) <2 (/^NP\[[a-z,=]*\]$/=koto <: こと)) <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/=niyori <: により)
+
+adjoinF (S[mod=adv,form=cont,fin=f]\\S[mod=nm,form=stem,fin=f]]=niyori2 @) niyori
+excise niyori niyori
+adjoinF (S/S=all2 @) all
+adjoinF (S=all3 @) all
+excise all all
+excise np np
+relabel koto /S\\S/
+adjoinF (S=ev @) ev_koto
+excise ev_koto ev_koto
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〜を〜することを目指す
+% to: WO EV を目指す
+
+/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np <1 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=x_ev <1 (/^NP\[[a-z,=]*\]$/ <2 (/^NP\[[a-z,=X12]*\]\\NP\[[a-z,=X12]*\]$/ <: を)) <2 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=ev_suru <1 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=ev) <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/ <: する)))) <2 (/^NP\[[a-z,=]*\]$/=koto <: こと)
+
+excise np np
+relabel koto /NP\\S[koto\]/
+adjoinF (S\\NP[case=o,mod=nm,fin=f]=ev2 @) ev
+excise ev ev
+adjoinF (S\\NP[case=o,mod=nm,fin=f]=ev_suru2 @) ev_suru
+excise ev_suru ev_suru
+adjoinF (S[mod=adn,form=base,fin=f]=x_ev2 @) x_ev
+excise x_ev x_ev
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: (〇〇や〜を〜する)ことの必要性
+% to: 〇〇や(WO EV)の必要性
+
+/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=all <1 (/^NP\[[a-z,=]*\]$/=sub_all <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np < (/^S\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=mae) <2 (/^NP\[[a-z,=]*\]$/=en2 < (/^NP\[[a-z,=X12]*\]$/=en)))))) <2 (/^NP\[[a-z,=]*\]$/=koto <: こと))
+
+adjoinF (NP[case=nc,mod=nm,fin=f]=sub_all2 @) sub_all
+move mae >1 sub_all2
+excise en2 en2
+excise np np
+relabel koto /NP\\S[koto\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〜に（転院となった）
+% to: （〜に転院）となった
+
+/^S\[[a-z,=]*\]$/=all <1 (/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/=ni <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/ <: に)) <2 (/^S\[[a-z,=]*\]$/=z <1 (/^NP\[[a-z,=]*\]$/=tento <1 (/^NP\[case=nc,mod=nm,fin=f\]$/=tenin) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=to <: と)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=natta))
+
+adjoinF (S[mod=ev,form=X2,fin=ev\]=x @) ni
+move tenin >2 x
+relabel tenin /S[mod=ev,form=X2,fin=ev\]/
+adjoinF (NP[case=nc,mod=nm,fin=f]=y @) x
+move to >2 all
+relabel all /NP[case=to,mod=nm,fin=f\]/
+delete tento
+adjoinF (S[mod=nm,form=base,fin=f]=all2 @) all
+move natta >2 all2
+delete z
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〜に（コンサルトとなった）
+% to: （〜にコンサルト）となった
+
+/^S\[[a-z,=]*\]$/=all <1 (/^NP\[[a-z,=]*\]$/=tokani <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=ni <: に)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=z <1 (/^NP\[[a-z,=]*\]$/=conto <1 (/^NP\[[a-z,=]*\]$/=cons) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=to <: と)) <2 (/^\<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]\>\\NP\[[a-z,=]*\]$/=natta <1 (/^\<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]\>\\NP\[[a-z,=]*\]$/=naru)))
+
+relabel ni /<S\/S>\\NP/
+adjoinF (S[mod=ev,form=X2,fin=ev\]=x @) tokani
+move cons >2 x
+relabel cons /S[mod=ev,form=X2,fin=ev\]/
+relabel tokani /S\/S/
+move to >2 all
+relabel all /NP[case=to,mod=nm,fin=f\]/
+delete conto
+adjoinF (S[mod=nm,form=base,fin=f]=all2 @) all
+move natta >2 all2
+delete z
+relabel naru /S\\NP[case=to,mod=nm,fin=f\]/
+relabel natta /S\\NP/
+adjoinF (NP[case=nc,mod=nm,fin=f]=np @) x
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 当院に（転院となった）
+% to: （当院に転院）となった
+
+/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=all <1 (/^S\[[a-z,=,X,1,2]*\]\/S\[[a-z,=,X,1,2]*\]$/=x_ni <2 (/^\<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]\>\\NP\[[a-z,=]*\]$/ <: に))<2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=z <1 (/^NP\[[a-z,=]*\]$/=evto <1 (/^NP\[[a-z,=]*\]$/=ev <: 紹介=shoukai) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=to <: と)) <2 (/^\<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]\>\\NP\[[a-z,=]*\]$/=naru <: なり))
+
+adjoinF (S[mod=ev,form=X2,fin=ev\]=x @) shoukai
+adjoinF (S[mod=ev,form=X2,fin=ev\]=y @) shoukai
+move x_ni >1 x
+excise all all
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: インスリン分泌を促進する作用
+% to: 促進する
+
+/^NP\/NP\[e_en\]$/ <1 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=all <2 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=sokusuru <1 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=sokushin <: 促進)))
+
+adjoinF (S[mod=adn,form=base,fin=f]=all2 @) all
+excise all all
+adjoinF (S[mod=adn,form=base,fin=f]\\NP[case=o,mod=nm,fin=f]=sosu @) sokusuru
+excise sokusuru sokusuru
+adjoinF (S[mod=nm,form=stem,fin=f]\\NP[case=o,mod=nm,fin=f]=sosu @) sokushin
+excise sokushin sokushin
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〜すること及び
+% to: 及びを(NP/NP)\NP にして、〜すること　もいい感じに
+
+/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=x <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np)<2 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=koto <: こと)) <2 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=oyobi <: /及び|および/))
+
+adjoinF (NP[case=nc,mod=nm,fin=f]=x2 @) x
+excise x x
+adjoinF (<NP/NP>\\NP=oyobi2 @) oyobi
+excise oyobi oyobi
+relabel koto /NP\\S[koto\]/
+excise np np
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 及びの意味表示
+% to: (NP/NP)\NP にする
+
+/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=x) <2 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=oyobi <: /及び|および/))
+
+adjoinF (NP[case=nc,mod=nm,fin=f]=x2 @) x
+excise x x
+adjoinF (<NP/NP>\\NP=oyobi2 @) oyobi
+excise oyobi oyobi
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: NEG EV の統語範疇が NP になってしまう
+% to: S\NP にする
+
+/^S\[[a-z,A-Z,=,1,2]*\]\\NP\[[a-z,A-Z,=,1,2]*\]$/ <1 (/^NP\[[a-z,A-Z,=,1,2]*\]$/=s_np < ( /^S[a-z,A-Z,=,\[,\],1,2,\/]*$/ <1 /^S\[mod=neg,[a-z,A-Z,=,\[,\],1,2,\/]*$/)) <2 (/^<S\[[a-z,A-Z,=,1,2]*\]\\NP\[[a-z,A-Z,=,1,2]*\]>\\NP\[[a-z,A-Z,=,1,2]*\]$/=de < で)
+
+adjoinF (S\\S[mod=nm,form=da,fin=f]=de2 @) de
+excise de de
+adjoinF (S[mod=nm,form=da,fin=f]=s_np2 @) s_np
+excise s_np s_np
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: NEG EV の統語範疇が NP になってしまう (主語がS/Sになってる系)
+% to: S\NP にする
+
+/^S\[[a-z,A-Z,=,1,2]*\]$/ <1 (/^S\[[a-z,A-Z,=,1,2]*\]\/S\[[a-z,A-Z,=,1,2]*\]$/=nom <2 (/^<S\[[a-z,A-Z,=,1,2]*\]\/S\[[a-z,A-Z,=,1,2]*\]>\\NP\[[a-z,A-Z,=,1,2]*\]$/=ha  <: /は|が/)) <2 (/^S\[[a-z,A-Z,=,1,2]*\]$/=aru <1 (/^S\[[a-z,A-Z,=,1,2]*\]$/=snp_de <1 (/^NP\[[a-z,A-Z,=,1,2]*\]$/=s_np < (/^S\[[a-z,A-Z,=,1,2]*\]$/ <1 /^S\[mod=neg,[a-z,A-Z,=,\[,\],1,2,\/]*$/)) <2 (/^S\[[a-z,A-Z,=,1,2]*\]\\NP\[[a-z,A-Z,=,1,2]*\]$/=de <: で)))
+
+relabel snp_de /S\\NP/
+relabel aru /S\\NP/
+adjoinF (NP[case=ga,mod=nm,fin=f]\\NP=ha2 @) ha
+excise ha ha
+adjoinF (NP[case=ga,mod=nm,fin=f]=nom2 @) nom
+excise nom nom
+adjoinF (S\\S[mod=nm,form=da,fin=f]=de2 @) de
+excise de de
+adjoinF (S[mod=nm,form=da,fin=f]\\NP=s_np2 @) s_np
+excise s_np s_np
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: NEG EV の統語範疇が NP になってしまう (主語がS/Sになってる系)（〜であった）
+% to: S\NP にする
+
+/^S\[[a-z,=]*\]$/ <1 (/^S\[[a-z,A-Z,=,1,2]*\]\/S\[[a-z,A-Z,=,1,2]*\]$/=nom <2 (/^<S\[[a-z,A-Z,=,1,2]*\]\/S\[[a-z,A-Z,=,1,2]*\]>\\NP\[[a-z,=]*\]$/=ha  <: /は|が/)) <2 (/^S\[[a-z,=]*\]$/=atta <1 (/^S\[[a-z,=]*\]$/=aru <1 (/^S\[[a-z,=]*\]$/=ev_de <1 (/^NP\[[a-z,=]*\]$/=np < (/^S\[[a-z,=,X2]*\]$/ <1 (/^S\[mod=neg,[a-z,A-Z,=,\[,\],1,2,\/]*$/))) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=de <: で))))
+
+adjoinF (NP[case=ga,mod=nm,fin=f]\\NP=ha2 @) ha
+excise ha ha
+adjoinF (NP[case=ga,mod=nm,fin=f]=nom2 @) nom
+excise nom nom
+adjoinF (S\\S[mod=nm,form=da,fin=f]=de2 @) de
+excise de de
+adjoinF (S[mod=nm,form=da,fin=f]\\NP=np2 @) np
+excise np np
+adjoinF (S\\NP=ev_de2 @) ev_de
+excise ev_de ev_de
+adjoinF (S\\NP=aru2 @) aru
+excise aru aru
+adjoinF (S\\NP=atta2 @) atta
+excise atta atta
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: NEG EV の統語範疇が NP になってしまう (歩行 未 獲得)
+% to: S にする
+
+/^S\[[a-z,A-Z,=,1,2]*\]$/ <1 (/^NP\[[a-z,A-Z,=,1,2]*\]$/=s < (/^S\[[a-z,A-Z,=,1,2]*\]$/ <2 (/^S\[[a-z,A-Z,=,1,2]*\]$/ <1 /^S\[mod=neg,[a-z,A-Z,=,\[,\],1,2,\/]*$/ ))) <2 (/^S\[[a-z,A-Z,=,1,2]*\]\\NP\[[a-z,A-Z,=,1,2]*\]$/=de <: で)
+
+adjoinF (S\\S[mod=nm,form=da,fin=f]=de2 @) de
+excise de de
+adjoinF (S[mod=nm,form=da,fin=f]=s2 @) s
+excise s s
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from:〇〇に××を〜したこと の「に」の統語範疇&ことを変えたい
+% to: できた
+
+/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np < (/^S\[[a-z,=]*\]$/ <1(/^NP\[[a-z,=]*\]$/=x_ni <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=ni <: に)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=woshita <2 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=shita <1 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=ev_shi <1 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=ev) <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/ <: し)))))) <2 (/^NP\[[a-z,=]*\]$/=koto <: こと)
+
+adjoinF (S\\NP[case=o,mod=nm,fin=f]=ev2 @) ev
+excise ev ev
+adjoinF (S\\NP[case=o,mod=nm,fin=f]=ev_shi2 @) ev_shi
+excise ev_shi ev_shi
+adjoinF (S\\NP[case=o,mod=nm,fin=f]=shita2 @) shita
+excise shita shita
+adjoinF (S=woshita2 @) woshita
+excise woshita woshita
+adjoinF (<S[mod=X1,form=X2,fin=f]\/S[mod=X1,form=X2,fin=f]>\\NP=ni2 @) ni
+excise ni ni
+adjoinF (S[mod=X1,form=X2,fin=f]\/S[mod=X1,form=X2,fin=f]=x_ni2 @) x_ni
+excise x_ni x_ni
+excise np np
+relabel koto /NP\\S[koto\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from:〇〇がXXに〜した の「XXに」の統語範疇を変えたい
+% to: できた
+
+/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=nishita <1 (/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/ <1 (/^S\[mod=nm,form=da,fin=f\]$/=en <: 胸膜) <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\S\[mod=nm,form=da,fin=f\]$/=ni <: に)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=shita <1 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=ev_shi <1 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=ev) <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/ <: し)))
+
+adjoinF (<S[mod=X1,form=X2,fin=f]\/S[mod=X1,form=X2,fin=f]>\\NP=ni2 @) ni
+excise ni ni
+adjoinF (NP[case=nc,mod=nm,fin=f]=en2 @) en
+excise en en
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〇〇に××を〜した の「に」の統語範疇が変
+% to: <S/S>\NP にする
+
+/^S\[[a-z,=]*\]$/ <1(/^NP\[[a-z,=]*\]$/=x_ni <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=ni <: に)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=woshita <2 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=shita <1 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=ev_shi <1 (/^<S\[[a-z,=]*\]\\NP\[[a-z,=]*\]>\\NP\[[a-z,=]*\]$/=ev) <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/ <: し))))
+
+adjoinF (S\\NP[case=o,mod=nm,fin=f]=ev2 @) ev
+excise ev ev
+adjoinF (S\\NP[case=o,mod=nm,fin=f]=ev_shi2 @) ev_shi
+excise ev_shi ev_shi
+adjoinF (S\\NP[case=o,mod=nm,fin=f]=shita2 @) shita
+excise shita shita
+adjoinF (S[mod=nm,form=base,fin=f]=woshita2 @) woshita
+excise woshita woshita
+adjoinF (<S[mod=X1,form=X2,fin=f]\/S[mod=X1,form=X2,fin=f]>\\NP=ni2 @) ni
+excise ni ni
+adjoinF (S[mod=X1,form=X2,fin=f]\/S[mod=X1,form=X2,fin=f]=x_ni2 @) x_ni
+excise x_ni x_ni
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 「当院消化器内科受診」がNPになっていて、色々変になってしまっている
+% to: S にする
+
+/^NP\[[a-z,=]*\]$/=all_maru <1 (/^NP\[[a-z,=]*\]$/=all<1 (/^NP\[[a-z,=,X12]*\]\/NP\[[a-z,=,X12]*\]$/=x < (/^S\[[a-z,=]*\]$/=mae_ten <1 (/^S\[[a-z,=,X123]*\]\/S\[[a-z,=,X123]*\]$/=mae < (/^S\[[a-z,=]*\]$/)) <2 (/^S\[[a-z,=]*\]$/=ten <: 、)))  <2 (/^NP\[[a-z,=]*\]$/=ato < (/^S\[mod=ev,form=X2,fin=ev\]$/))) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=maru <: 。)
+
+excise mae mae
+excise x x
+adjoinF (<S\/S>\\S=ten2 @) ten
+excise ten ten
+excise ato ato
+adjoinF (S\/S=mae_ten2 @) mae_ten
+excise mae_ten mae_ten
+adjoinF (S=all2 @) all
+excise all all
+adjoinF (S\\S=maru2 @) maru
+excise maru maru
+adjoinF (S=all_maru2 @) all_maru
+excise all_maru all_maru
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 「PSL投与開始」がNPになっていて、色々変になってしまっている
+% to: S にする
+
+/^NP\[[a-z,=]*\]$/=all_maru <1 (/^NP\[[a-z,=]*\]$/=all<1 (/^NP\[[a-z,=,X12]*\]\/NP\[[a-z,=,X12]*\]$/=x < (/^S\[[a-z,=]*\]$/=mae_ten <1 (/^S\[[a-z,=,X123]*\]\/S\[[a-z,=,X123]*\]$/=mae < (/^NP\[[a-z,=]*\]$/)) <2 (/^S\[[a-z,=]*\]$/=ten <: 、)))  <2 (/^NP\[[a-z,=]*\]$/=ato < (/^S\[mod=ev,form=X2,fin=ev\]$/))) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=maru <: 。)
+
+excise ato ato
+adjoinF (S=all2 @) all
+excise all all
+adjoinF (S\\S=maru2 @) maru
+excise maru maru
+adjoinF (S=all_maru2 @) all_maru
+excise all_maru all_maru
+adjoinF (S\/S=mae_ten2 @) mae_ten
+excise mae_ten mae_ten
+excise x x
+adjoinF (<S\/S>\\<S\/S>=ten2 @) ten
+excise ten ten
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 「消化器内科転科」がNPになっていて、色々変になってしまっている
+% to: S にする
+
+/^NP\[[a-z,=]*\]$/=all_maru <1 (/^NP\[[a-z,=]*\]$/=all<1 (/^NP\[[a-z,=,X12]*\]\/NP\[[a-z,=,X12]*\]$/=x < (/^S\[[a-z,=]*\]$/=mae_ten <1 (/^S\[[a-z,=,X123]*\]$/=mae) <2 (/^S\[[a-z,=X12]*\]\\S\[[a-z,=X12]*\]$/=ten <: 、)))  <2 (/^NP\[[a-z,=]*\]$/=ato < (/^S\[mod=ev,form=X2,fin=ev\]$/))) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=maru <: 。)
+
+adjoinF (<S\/S>\\S=ten2 @) ten
+excise ten ten
+adjoinF (S\/S=mae_ten2 @) mae_ten
+excise mae_ten mae_ten
+excise x x
+excise ato ato
+adjoinF (S=all2 @) all
+excise all all
+adjoinF (S\\S=maru2 @) maru
+excise maru maru
+adjoinF (S=all_maru2 @) all_maru
+excise all_maru all_maru
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 「胸膜転移再発」がNPになっていて、色々変になってしまっている
+% to: S にする
+
+/^NP\[[a-z,=]*\]$/=all <1 (/^NP\[[a-z,=X12]*\]$/=suball <1 (/^NP\[[a-z,=X12]*\]$/ <1 (/^NP\[[a-z,=X12]*\]$/<1 (/^NP\[[a-z,=X12]*\]$/))) < 2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=s_np < (/^S\[[a-z,=X2]*\]$/))) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=maru <: 。)
+
+adjoinF (S\\NP[case=ga,mod=nm,fin=f]=s_np2 @) s_np
+adjoinF (S=suball2 @) suball
+adjoinF (S=all2 @) all
+excise all all
+excise suball suball
+excise s_np s_np
+adjoinF (S\\S=maru2 @) maru
+excise maru maru
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〇〇と診断された
+% to: 「〇〇と」をNPにする
+
+/^S\[[a-z,=]*\]$/ <1 (/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/=x_to <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/=to <: と)) <2 (/^S\[[a-z,=]*\]$/=sareta <1 (/^S\[[a-z,=]*\]$/=sare <1 (/^S\[[a-z,=]*\]$/=ev_sa <1 (/^S\[[a-z,=]*\]$/=ev <: 診断))))
+
+adjoinF (NP[case=to,mod=nm,fin=f]\\NP=to2 @) to
+excise to to
+adjoinF (NP[case=to,mod=nm,fin=f]=x_to2 @) x_to
+excise x_to x_to
+adjoinF (S\\NP[case=to,mod=nm,fin=f]=sareta2 @) sareta
+excise sareta sareta
+adjoinF (S\\NP[case=to,mod=nm,fin=f]=sare2 @) sare
+excise sare sare
+adjoinF (S\\NP[case=to,mod=nm,fin=f]=ev_sa2 @) ev_sa
+excise ev_sa ev_sa
+adjoinF (S\\NP[case=to,mod=nm,fin=f]=ev2 @) ev
+excise ev ev
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 〇〇と診断された
+% to: 「〇〇と」をNPにする
+
+/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/ <1 (/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/=x_to <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/=to <: と)) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=sareta <1 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=sare <1 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=ev_sa <1 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=ev <: 診断))))
+
+adjoinF (NP[case=to,mod=nm,fin=f]\\NP=to2 @) to
+excise to to
+adjoinF (NP[case=to,mod=nm,fin=f]=x_to2 @) x_to
+excise x_to x_to
+adjoinF (<S\\NP[case=ga,mod=nm,fin=f]>\\NP[case=to,mod=nm,fin=f]=sareta2 @) sareta
+excise sareta sareta
+adjoinF (<S\\NP[case=ga,mod=nm,fin=f]>\\NP[case=to,mod=nm,fin=f]=sare2 @) sare
+excise sare sare
+adjoinF (<S\\NP[case=ga,mod=nm,fin=f]>\\NP[case=to,mod=nm,fin=f]=ev_sa2 @) ev_sa
+excise ev_sa ev_sa
+adjoinF (<S\\NP[case=ga,mod=nm,fin=f]>\\NP[case=to,mod=nm,fin=f]=ev2 @) ev
+excise ev ev
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: (〇〇に対し〇〇を〇〇することを)開始した
+% to: 〇〇に対し(〇〇を〇〇することを開始した)
+
+/^S\[[a-z,=]*\]$/ <1 (/^S\[[a-z,=]*\]$/=all <1 (/^NP\[[a-z,=]*\]$/=ev_wo <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np < (/^S\[[a-z,=]*\]$/ <1 (/^S\[[a-z,=X123]*\]\/S\[[a-z,=X123]*\]$/=mae) <2 (/^S\[[a-z,=]*\]$/=x))) <2 (/^NP\[[a-z,=]*\]$/=koto <: こと))) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=s_ev))
+
+adjoinF (S[mod=nm,form=base,fin=f]=s_ev2 @) s_ev
+move mae >1 all
+move ev_wo >1 s_ev2
+excise np np
+excise x x
+relabel koto /NP\\S[koto\]/
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: （〜ため、〜する）ことが可能となった
+% to: 〜ため、（〜することが可能となった）
+
+/^S\[[a-z,=]*\]$/=all <1 (/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/=x_to <1 (/^S\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/=ev_ga <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=np < (/^S\[[a-z,=]*\]$/ <1 (/^S\[[a-z,=X123]*\]\/S\[[a-z,=X123]*\]$/=mae) <2 (/^S\[[a-z,=]*\]$/=x))) <2 (/^NP\[[a-z,=]*\]$/=koto <: こと))))) <2 (/^S\[[a-z,=]*\]$/=natta <1 (/^S\[[a-z,=]*\]$/=na) <2 (/^S\[[a-z,=]*\]\\S\[[a-z,=]*\]$/=ta <: た))
+
+relabel koto /NP\\S[koto\]/
+move mae >1 all
+adjoinF (S[mod=nm,form=base,fin=f]=ta2 @) ta
+move na >1 ta2
+move x_to >1 natta
+excise np np
+excise x x
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: （〜ため、〜する）ことが可能となった
+% to: 〜ため、（〜することが可能となった）
+
+/^S\[[a-z,=]*\]$/=all <1 (/^S\[[a-z,=X123]*\]\/S\[[a-z,=X123]*\]$/=s1 < (/^NP\[[a-z,=]*\]$/ <2 (/^NP\[[a-z,=X12]*\]\\NP\[[a-z,=X12]*\]$/ <: 、))) <2 (/^S\[[a-z,=]*\]$/ <1 (/^S\[[a-z,=X123]*\]\/S\[[a-z,=X123]*\]$/ < (/^S\[[a-z,=]*\]$/=s2 <2 (/^S\[[a-z,=X12]*\]\\S\[[a-z,=X12]*\]$/ <: 、))) <2 (/^S\[[a-z,=]*\]$/=s3))
+
+adjoinF (S[mod=adv,form=cont,fin=f]=s22 @) s2
+move s1 >1 s22
+excise all all
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: （〜ため、〜する）ことが可能となった
+% to: 〜ため、（〜することが可能となった）
+
+/^S\[[a-z,=]*\]$/=all <1 (/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/=mae <1 (/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/=x_ha <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/=ha)) <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>$/=ten)) <2 (/^S\[[a-z,=]*\]$/=ato <2 (/^S\[[a-z,=]*\]$/=suball <1 (/^NP\[[a-z,=]*\]$/=ga) <2 (/^S\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/=ev <: 上昇) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/=to)))))
+
+adjoinF (S\\NP=ev2 @) ev
+adjoinF (S[mod=ev,form=X2,fin=ev]=ev3 @) ev2
+adjoinF (NP[case=nc,mod=nm,fin=f]=ev4 @) ev3
+excise ev ev
+excise suball suball
+move ga >1 ev3
+adjoinF (NP[case=ga,mod=nm,fin=f]\\NP=ha2 @) ha
+excise ha ha
+adjoinF (NP[case=ga,mod=nm,fin=f]=x_ha2 @) x_ha
+excise x_ha x_ha
+adjoinF (NP\\NP=ten2 @) ten
+excise ten ten
+adjoinF (NP=mae2 @) mae
+excise mae mae
+adjoinF (S\\NP=ato2 @) ato
+excise ato ato
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 所見で（〜を疑い、〜した）
+% to: （所見で〜を疑い、）〜した
+
+/^S\[[a-z,=]*\]$/=all <1 (/^S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]$/=x_de <1 (/^NP\[[a-z,=]*\]$/ <: 所見) <2 (/^<S\[[a-z,=X12]*\]\/S\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/ <: で)) <2 (/^S\[[a-z,=]*\]$/ <1 (/^S\[[a-z,=X123]*\]\/S\[[a-z,=X123]*\]$/ < (/^S\[[a-z,=]*\]$/=s2)))
+
+adjoinF (S[mod=adv,form=cont,fin=f]=s2_2 @) s2
+move x_de >1 s2_2
+excise all all
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: 「CTにて」の統語範疇が変
+% to: 「CT」をNPにする
+
+/^S\[mod=X1,form=X2,fin=f\]\/S\[mod=X1,form=X2,fin=f\]$/ <1 (/^S\[mod=X1,form=X2,fin=f\]\/S\[mod=X1,form=X2,fin=f\]$/=ct) <2 (/^S\[mod=X1,form=X2,fin=f\]\/S\[mod=X1,form=X2,fin=f\]$/=nite < にて)
+
+adjoinF (NP[case=nc,mod=nm,fin=f]=ct2 @) ct
+excise ct ct
+adjoinF (<S[mod=X1,form=X2,fin=f]/S[mod=X1,form=X2,fin=f]>\\NP[case=nc,mod=nm,fin=f]=nite2 @) nite
+excise nite nite
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% from: (~による△△性)の〇〇
+% to: ~による(△△性の〇〇)
+
+/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=]*\]$/=sub_all <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/ <1 (/^NP\[[a-z,=]*\]$/ <1 (/^NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]$/=mae < (/^S\[[a-z,=]*\]$/)) <2 (/^NP\[[a-z,=]*\]$/=men < (/^NP\[[a-z,=X12]*\]$/))) <2 (/^<NP\[[a-z,=X12]*\]\/NP\[[a-z,=X12]*\]>\\NP\[[a-z,=]*\]$/ <: の)) <2 (/^NP\[[a-z,=]*\]$/=en)) <2 (/^NP\[[a-z,=]*\]\\NP\[[a-z,=]*\]$/ <: /を|が/)
+
+adjoinF (NP[case=nc,mod=nm,fin=f]=sub_all2 @) sub_all
+move mae >1 sub_all2
+excise men men
