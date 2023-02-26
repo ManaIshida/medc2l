@@ -21,6 +21,9 @@ pyenv activate mec2l
 pip install cython numpy depccg=1.1.0 nltk==3.0.5 janome
 depccg_ja download
 ```
+```
+git clone https://github.com/ManaIshida/medc2l.git
+```
 
 ### depccgのテスト
 ```
