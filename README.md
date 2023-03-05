@@ -36,3 +36,16 @@ You can also check the semantic representation with `--sem` option.
 pyenv activate flask
 python test.py --input "平成15年12月 に 出産2週間後 より 発熱 、 発疹 が 出現 し た 。" --sem > test.html
 ```
+
+## 参考文献
+- 石田 真捺，谷中 瞳，馬目 華奈，戸次 大介．
+「論理推論による症例検索に向けた日本語症例テキストの複合語解析の試案」
+第35回人工知能学会全国大会論文集,2021．
+
+- 石田 真捺，谷中 瞳，戸次 大介．
+「日本語症例テキストの複合語解析と論理推論」
+第36回人工知能学会全国大会論文集，2022．
+
+- Mana Ishida, Hitomi Yanaka, and Daisuke Bekki.
+"Compositional Semantics for Compound Words in Medical Case Retrieval."
+In Proceedings of the 18th International Workshop on Logic and Engineering of Natural Language Semantics (LENLS18), pp.231-239, 2021.
