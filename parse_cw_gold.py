@@ -152,6 +152,106 @@ def main():
     pre_surf = pre_surf1.split()
     pre_tag = pre_tags1.split()
 
+    #Goldタグを採用したMedc2l：複合語タグ分類モデルの予測が失敗してしまうものについて、手動でタグを指定
+    ev_en = [['追加', '薬剤'],['作用', '時期']]
+    men_en = [['MRI', '検査'],['下肢', '装具'],['一般', '病棟'],['早期', '胃癌']]
+    pa_en = [['咽頭', '癌'],['腎', '不全'],['脊髄', '腫瘍'],['鼠径', 'ヘルニア']]
+    pp_en = [['整形', '外科'],['尿', '中'],['尿', '量'],['尿道', 'カテーテル']]
+    wo_ev = [['PSL', '漸増'],['薬剤', '服用'],['動作', '改善']]
+    men_wo_ev = [['基本', '動作', '改善'],['基本', '動作', '練習'],['入院', 'リハビリ', '開始']]
+    pp_men_en = [['関節', 'リウマチ', '患者'],['足', '底', '装具']]
+    pp_pp_pp_en = [['抗', 'PD', '1', '抗体'],['第', '一', '選択', '薬']]
+    pp_men_pp_en = [['真', '菌', '感染', '症']]
+    pp_pp_men_en = [['肝', '細胞', '性', '黄疸'],['肝', '胆道', '系', '酵素']]
+    men_pp_men_en = [['三宅', '甲', '型', '肝硬変']]
+    men_pa_pp_pp_en = [['右', '膝', '屈曲', '拘', '縮'],['左', '膝', '屈曲', '拘', '縮']]
+    men_pp_ni_wo_ev = [['右', '尿', '管', 'ステント', '挿入'],['左', '尿', '管', 'ステント', '挿入']]
+    men_pp_pa_pp_en = [['カンジダ', '尿', '路', '感染', '症'],['クラミジア', '尿', '路', '感染', '症']]
+    men_pp_pp_pa_en = [['右', '腸', '腰', '筋', '膿瘍'],['左', '腸', '腰', '筋', '膿瘍']]
+
+    if pre_surf in ev_en:
+        pre_tag = ['EV', 'EN']
+    elif pre_surf in men_en:
+        pre_tag = ['M_EN', 'EN']
+    elif pre_surf in pa_en:
+        pre_tag = ['PA', 'EN']
+    elif pre_surf in pp_en:
+        pre_tag = ['PP', 'EN']
+    elif pre_surf in wo_ev:
+        pre_tag = ['WO', 'EV']
+    elif pre_surf in men_wo_ev:
+        pre_tag = ['M_EN', 'WO', 'EV']
+    elif pre_surf in pp_men_en:
+        pre_tag = ['PP', 'M_EN', 'EN']
+    elif pre_surf in pp_pp_pp_en:
+        pre_tag = ['PP', 'PP', 'PP', 'EN']
+    elif pre_surf in pp_men_pp_en:
+        pre_tag = ['PP', 'M_EN', 'PP', 'EN']
+    elif pre_surf in pp_pp_men_en:
+        pre_tag = ['PP', 'PP', 'M_EN', 'EN']
+    elif pre_surf in men_pp_men_en:
+        pre_tag = ['M_EN', 'PP', 'M_EN', 'EN']
+    elif pre_surf in men_pa_pp_pp_en:
+        pre_tag = ['M_EN', 'PA', 'PP', 'PP', 'EN']
+    elif pre_surf in men_pp_pa_pp_en:
+        pre_tag = ['M_EN', 'PP', 'PA', 'PP', 'EN']
+    elif pre_surf in men_pp_pp_pa_en:
+        pre_tag = ['M_EN', 'PP', 'PP', 'PA', 'EN']
+    elif pre_surf in men_pp_ni_wo_ev:
+        pre_tag = ['M_EN', 'PP', 'NI', 'WO', 'EV']
+    elif pre_surf == ['歩行', '未', '獲得']:
+        pre_tag = ['EV', 'NEG', 'S_EV']
+    elif pre_surf == ['左側', '股関節', '伸展']:
+        pre_tag = ['M_EN', 'GA', 'EV']
+    elif pre_surf == ['精査', '加療']:
+        pre_tag = ['EV', 'EV']
+    elif pre_surf == ['右', '腎', '膿瘍']:
+        pre_tag = ['M_EN', 'PA', 'EN']
+    elif pre_surf == ['左', '膝', '屈曲', '拘', '縮', '除去', '術']:
+        pre_tag = ['M_EN', 'PA', 'PP', 'PP', 'WO', 'EV', 'EN']
+    elif pre_surf == ['真性', '動脈', '瘤']:
+        pre_tag = ['M_EN', 'PP', 'EN']
+    elif pre_surf == ['粘膜', '類', '天', '疱瘡']:
+        pre_tag = ['M_EN', 'PP', 'PP', 'EN']
+    elif pre_surf == ['定型', '抗', '酸', '菌', '症']:
+        pre_tag = ['M_EN', 'PP', 'PP', 'PP', 'EN']
+    elif pre_surf == ['非', '定型', '抗', '酸', '菌', '症']:
+        pre_tag = ['NEG', 'M_EN', 'PP', 'PP', 'PP', 'EN']
+    elif pre_surf == ['非', '持続', '性', '心室', '頻', '拍']:
+        pre_tag = ['NEG', 'PP', 'M_EN', 'PP', 'PP', 'EN']
+    elif pre_surf == ['肝', '機能', '改善', '効果']: #前後の文によって「GA」と「WO」が変わるため、一概にこれがいいとは限らない
+        pre_tag = ['PA', 'GA', 'EV', 'E_EN']
+    elif pre_surf == ['肝', '機能', '改善', '傾向']:
+        pre_tag = ['PA', 'GA', 'EV', 'T_EN']
+    elif pre_surf == ['直腸', '癌', '左', '副腎', '転移']:
+        pre_tag = ['PA', 'GA', 'M_EN', 'NI', 'EV']
+    elif pre_surf == ['腎', '細胞', '癌']:
+        pre_tag = ['PA', 'M_EN', 'EN']
+    elif pre_surf == ['炎症', '反応', '改善', '傾向']:
+        pre_tag = ['PP', 'GA', 'EV', 'T_EN']
+    elif pre_surf == ['当', '院', '搬送']:
+        pre_tag = ['PP', 'NI', 'EV']
+    elif pre_surf == ['腸', '骨', '筋', '弛緩']:
+        pre_tag = ['PP', 'PP', 'GA', 'EV']
+    elif pre_surf == ['自己', '免疫', '性', '肝炎', '類似', '像']:
+        pre_tag = ['PP', 'PP', 'M_EN', 'NI', 'EV', 'EN']
+    elif pre_surf == ['腸', '腰', '筋', '膿瘍']:
+        pre_tag = ['PP', 'PP', 'PA', 'EN']
+    elif pre_surf == ['短', '母', '指', '外', '転', '筋']:
+        pre_tag = ['PP', 'PP', 'PA', 'PP', 'PP', 'EN']
+    elif pre_surf == ['S', '-', '1', '+', 'CDDP', '療法']:
+        pre_tag = ['PP', 'PP', 'PP', 'PP', 'PP', 'EN']
+    elif pre_surf == ['S', '-', '1', '休', '薬', '期間']:
+        pre_tag = ['PP', 'PP', 'WO', 'PP', 'EV', 'Q_EN']
+    elif pre_surf == ['当', '科', '退院']:
+        pre_tag = ['PP', 'WO', 'EV']
+    elif pre_surf == ['免疫', '調整', '薬']:
+        pre_tag = ['WO', 'EV', 'EN']
+    elif pre_surf == ['Nivolumab', '休', '薬']:
+        pre_tag = ['WO', 'PP', 'EV']
+    elif pre_surf == ['慢性', '期', '皮膚', '筋炎', '患者']:
+        pre_tag = ['PP', 'M_EN', 'PA', 'M_EN', 'EN']
+
     print(pre_surf, pre_tag)
 
     surf, tags = merge_pp(pre_surf, pre_tag)

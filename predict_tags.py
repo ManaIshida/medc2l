@@ -6,19 +6,19 @@ from keras.models import load_model, model_from_json
 from keras.layers import Dense, LSTM, InputLayer, Bidirectional, TimeDistributed, Embedding, Activation
 from keras.optimizers import Adam
 
-#モデル
+#読み込むモデルを指定
 model = model_from_json(open('model/model.json').read())
 model.load_weights('model/model.h5')
 
-
 import numpy as np
 tagged_sents = []
+sentences = []
+surfs = []
+
 f = open('cw.txt', 'r')
 lines = f.readlines() #ファイルの各行を読み込んでリストにする
 f.close()
-#print(lines)
-sentences = []
-surfs = []
+
 for line in lines:
     ln = line.strip() # \nを削除
     l = ln.split('\t') # タブの箇所で区切ってリストにする
@@ -27,7 +27,6 @@ for line in lines:
     tlist = l[1].split() # GIS 所見 みたいなのを['GIS','所見']にする
     t_sentence = tuple(tlist)
     sentences.append(np.array(t_sentence))
-#print(sentences)
 test_sentences = sentences
 
 # 単語，タグのID化

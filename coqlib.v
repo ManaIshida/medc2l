@@ -33,23 +33,25 @@ Parameter Dat : Event -> Entity.
 Parameter Attr : Event -> Entity.
 Parameter Deg : Event -> Entity.
 
-(* My roles *)
+(* Medc2l roles *)
 Parameter asEntity : Event -> Entity.
 Parameter PartOf : Entity -> Entity -> Prop.
 Parameter Of : Entity -> Entity -> Prop.
-Parameter _する : Event -> Prop.
 Parameter Obj : Entity -> Event.
+
+(* other *)
 Parameter _アシドxmdashxシス : Entity -> Prop.
-Parameter _こと : Entity -> Prop.
-Parameter _ドレナxmdashxジ術 : Entity -> Prop.
+Parameter _アルコxmdashxル性 : Entity -> Prop.
 Parameter _アプロxmdashxチ : Event -> Prop.
-Parameter _ドレxmdashxン : Entity -> Prop.
 Parameter _コントロxmdashxル : Event -> Prop.
+Parameter _ドレナxmdashxジ術 : Entity -> Prop.
+Parameter _ドレxmdashxン : Entity -> Prop.
+Parameter _プレイルxmdashxム内 : Entity -> Prop.
+Parameter _尿道カテxmdashxテル : Entity -> Prop.
+Parameter _こと : Entity -> Prop.
 Parameter K_e3 : (Event -> Prop) -> (Event -> Prop).
 Parameter K_4 : (Event -> Prop) -> (Event -> Prop).
-Parameter _尿道カテxmdashxテル : Entity -> Prop.
-Parameter _プレイルxmdashxム内 : Entity -> Prop.
-Parameter _アルコxmdashxル性 : Entity -> Prop.
+
 
 (* Binary quantifiers *)
 Parameter Most : (Entity -> Prop) -> (Entity -> Prop) -> Prop.
@@ -289,13 +291,14 @@ Ltac solve_causative_閉める_閉まる :=
      => apply causative_閉める_閉まる with (v := e) in H1
   end.
 
-(* My role *)
+(* Medc2l role *)
 Axiom factive_AccI : forall v : Event, forall P : Prop,
   P -> AccI v P.
 Axiom factive_AccI2 : forall v : Event, forall P : Prop,
   AccI v P ->  P.
 
 Parameter _なる : Event -> Prop.
+Parameter _する : Event -> Prop.
 Parameter _診断 : Event -> Prop.
 Parameter _考える : Event -> Prop.
 
@@ -318,7 +321,6 @@ Axiom factive_Content3 : forall (x : Entity) (P : ((Event -> Prop) -> Event -> P
 
 Parameter _ところ : Entity -> Prop.
 Parameter _ため : Entity -> Prop.
-
 Ltac solve_Content :=
   match goal with
     | [H1 : _ところ ?e, H2 : Content ?e _ |- _] => try apply factive_Content with (x:=e) in H2
@@ -337,7 +339,6 @@ Ltac solve_Content2 :=
 
 Parameter _減らす : Event -> Prop.
 Parameter _減量 : Event -> Prop.
-
 Axiom causative_減らす : forall v : Event,
   _減量 v /\ _する v -> _減らす v.
 Ltac solve_causative_減らす :=
@@ -348,7 +349,6 @@ Ltac solve_causative_減らす :=
 
 Parameter _開始 : Event -> Prop.
 Parameter _始める : Event -> Prop.
-
 Axiom causative_始める : forall v : Event,
   _開始 v /\ _する v -> _始める v.
 Axiom causative_始める2 : forall (v1 : Event)(v2 : Event),
@@ -499,8 +499,8 @@ Ltac solve_causative_両_左 :=
      => apply causative_両_左 with (x := t1)
   end.
 
-(* Preliminary tactics *)
 
+(* Preliminary tactics *)
 Ltac apply_ent :=
   match goal with
     | [x : Entity, H : forall x : Entity, _ |- _]

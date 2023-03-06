@@ -22,15 +22,11 @@
 # 'unknown' (none of the former).
 # You can use it as:
 #
-# ./medc2l.sh <sentences.txt> <semantic_templates.yaml> <nbest>
+# ./medc2l.sh <sentences.txt> <semantic_templates.yaml> <transform.tsgn>
 #
-
 USAGE="Usage: ./medc2l.sh <sentences.txt> <semantic_templates.yaml> <transform.tsgn>"
 
-# Set the number of nbest parses (Default: 1)
-#nbest=${4:-1}
-
-# Create a file named "tregex_location.txt" at the "scripts" directory
+# Create a file named "tregex_location.txt" at the "tense" directory
 # $ cat tregex_location.txt
 # /path/to/stanford-tregex-20XX-XX-XX
 tregex_dir=`cat tense/tregex_location.txt`
@@ -44,7 +40,7 @@ if [ ! -f $tsurgeon_templates ]; then
   exit 1
 fi
 
-# This variable contains the filename where the category templates are.
+# This variable contains the filename where the semantic templates are.
 category_templates=$2
 if [ ! -f $category_templates ]; then
   echo "Error: File with semantic templates does not exist."
@@ -52,7 +48,7 @@ if [ ! -f $category_templates ]; then
   exit 1
 fi
 
-# This variable contains the name of the dataset (fracas or jsem).
+# This variable contains the name of the dataset.
 sentences_fname=$1
 sentences_basename=${sentences_fname##*/}
 if [ ! -f $sentences_fname ]; then
@@ -63,17 +59,10 @@ fi
 
 # These variables contain the names of the directories where intermediate
 # results will be written.
-#plain_dir="ja_plain" # tokenized sentences.
-#parsed_dir="ja_parsed" # parsed sentences into XML or other formats.
-#results_dir="ja_results" # HTML semantic outputs, proving results, etc.
-
-#tre_* は、coqlib.vが tense/coqlib_my_nlp2023.v
-#tre_*_test は、coqlib.vが tense/coqlib_my_nlp2023_test.v (nltac_initを、昔のルールに寄せてみた)
-
-plain_dir="rte_plain" # tokenized sentences.
+plain_dir="rte_plain" # inputed sentences.
 parsed_dir="rte_parsed" # parsed sentences into XML or other formats.
-results_dir="rte_results"
-tags_dir="rte_tags"
+results_dir="rte_results" # HTML semantic outputs, proving results, etc.
+tags_dir="rte_tags" # compound words and predicted tags.
 
 mkdir -p $plain_dir $parsed_dir $results_dir $tags_dir
 
@@ -141,11 +130,11 @@ parse_depccg $sentences_basename
 python ccg2lambda/brackets.py ${parsed_dir}/${sentences_basename}.jigg.xml \
     > ${parsed_dir}/${sentences_basename}.ptb
 
-# TODO: detect cw and output cw_origin_x.ptb and cw.txt
+# detect cw and output cw_origin_x.ptb and cw.txt
 rm cw.txt
 python extract_cw.py ${parsed_dir}/${sentences_basename}.jigg.xml
 
-# TODO: predict cw tags with cw.txt
+# predict cw tags with cw.txt
 echo "predict tags"
 python predict_tags.py > ${tags_dir}/${sentences_basename}
 
@@ -160,11 +149,14 @@ do
   tags=`echo "${t}"`
 
   #CFG木を構築
-  python parse_cw.py --surf="${surf}" --tags="${tags}"
+  python parse_cw_gold.py --surf="${surf}" --tags="${tags}" #Goldタグ
+  #python parse_cw.py --surf="${surf}" --tags="${tags}" #BiLSTMモデルのタグ予測を採用
+
 
   cat cw_new.ptb
+
   # pattern match and modify tree
-  # input: ${parsed_dir}/${sentences_basename}.ptb, cw_origin_x.ptb, cw_new.ptb
+  # input: ${parsed_dir}/${sentences_basename}.ptb, cw_origin_*.ptb, cw_new.ptb
   # output: ${parsed_dir}/${sentences_basename}.mod.ptb
   origin_ptb="cw_origin_${count}.ptb"
 
@@ -191,7 +183,6 @@ do
   let ++count
 done < cw_tag.txt
 IFS=$IFS_BACKUP
-
 #意味合成について失敗したとき、１つずつデバッグしたい場合は、ccg2lambda/semantic_index.py のprint（L73,L85~88）を復活させてください
 
 echo "Execute tsurgeon"
