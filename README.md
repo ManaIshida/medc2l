@@ -40,6 +40,7 @@ python test.py --input "平成15年12月 に 出産2週間後 より 発熱 、 
 ### tsurgeonに関する設定
 
 `medc2l/tense/`の中に`stanford-tregex-2018-10-16`があることを確認し、pathを取得
+
 `medc2l/tense/tregex_location.txt`の中身を取得したpathに書き換える
 ```
 cd tense/stanford-tregex-2018-10-16
