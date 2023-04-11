@@ -44,7 +44,7 @@ python test.py --input "平成15年12月 に 出産2週間後 より 発熱 、 
 `medc2l/tense/tregex_location.txt`の中身を取得したpathに書き換える
 ```
 cd tense/stanford-tregex-2018-10-16
-pwd
+pwd > path/to/tense/tregex_location.txt
 ```
 
 ## データセット
