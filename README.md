@@ -88,3 +88,7 @@ In Proceedings of the 18th International Workshop on Logic and Engineering of Na
 - 石田真捺，谷中瞳，戸次大介．
 「日本語症例テキストの複合語解析・推論システムMedc2l」
 自然言語処理， Vol.30 No.3， pp.935-958． 2023．
+
+
+## 連絡先
+石田真捺(Mana Ishida)：ishida.ocha@gmail.com
