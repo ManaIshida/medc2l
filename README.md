@@ -85,10 +85,10 @@ pwd > path/to/tense/tregex_location.txt
 "Compositional Semantics for Compound Words in Medical Case Retrieval."
 In Proceedings of the 18th International Workshop on Logic and Engineering of Natural Language Semantics (LENLS18), pp.231-239, 2021.
 
-- 石田真捺，谷中瞳，戸次大介．
+- 石田 真捺，谷中 瞳，戸次 大介．
 「日本語症例テキストの複合語解析・推論システムMedc2l」
 自然言語処理， Vol.30 No.3， pp.935-958． 2023．
 
 
 ## 連絡先
-石田真捺(Mana Ishida)：ishida.ocha@gmail.com
+- 石田 真捺(Mana Ishida)：ishida.ocha@gmail.com
